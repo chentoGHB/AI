@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Commands Review - College of DuPage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .student-info {
+            background: white;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 1200px;
+            border-left: 5px solid #2a5298;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content {
+            background: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2a5298;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #1e3c72;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .command-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-left: 4px solid #2a5298;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-name {
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+        }
+
+        .description {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+
+        .example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .important {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+
+
+        .footer {
+            background: #2a5298;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Linux Commands Review</h1>
+        <div class="subtitle">College of DuPage - CIT</div>
+    </div>
+
+    <div class="container">
+        <div class="student-info">
+            <h3>Student: Tony Chen</h3>
+            <p><strong>Institution:</strong> College of DuPage (cod.edu)</p>
+            <p><strong>Course:</strong> Linux System Administration - CIT</p>
+            <p><strong>Review Topic:</strong> Essential Linux Commands and System Navigation</p>
+        </div>
+
+
+
+        <div class="content">
+            <div class="section" id="login">
+                <h2>1. Linux System Login</h2>
+                <div class="description">
+                    Linux systems require authentication to access the system. Users must provide valid credentials to establish a session.
+                </div>
+                
+                <div class="command-box">
+                    <div class="command-name">Login Process</div>
+                    <div class="example">
+                        login: username<br>
+                        Password: [hidden input]<br>
+                        Last login: Wed Jul 03 10:30:45 2025 from 192.168.1.100<br><br>
+                        
+                        # Example session:<br>
+                        login: tchen<br>
+                        Password: <br>
+                        Last login: Wed Jul 03 10:30:45 2025 from 192.168.1.100<br>
+                        Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-78-generic x86_64)<br>
+                        tchen@server:~$
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">SSH Remote Login</div>
+                    <div class="example">
+                        ssh username@hostname<br>
+                        ssh username@192.168.1.50<br>
+                        ssh -p 2222 username@server.cod.edu<br><br>
+                        
+                        # Example session:<br>
+                        $ ssh tchen@192.168.1.50<br>
+                        The authenticity of host '192.168.1.50 (192.168.1.50)' can't be established.<br>
+                        Are you sure you want to continue connecting (yes/no/[fingerprint])? yes<br>
+                        tchen@192.168.1.50's password: <br>
+                        Welcome to Ubuntu 22.04.3 LTS<br>
+                        tchen@remoteserver:~$
+                    </div>
+                </div>
+
+                <div class="important">
+                    <strong>Security Note:</strong> Always use secure protocols like SSH for remote connections. Avoid telnet and other unencrypted protocols.
+                </div>
+            </div>
+
+            <div class="section" id="password">
+                <h2>2. Password Management</h2>
+                <div class="description">
+                    Managing user passwords is crucial for system security. Linux provides several commands for password administration.
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">passwd - Change Password</div>
+                    <div class="example">
+                        passwd<br>
+                        # Changes current user's password<br><br>
+                        
+                        sudo passwd username<br>
+                        # Changes another user's password (requires admin privileges)<br><br>
+                        
+                        # Example session:<br>
+                        $ passwd<br>
+                        Changing password for tchen.<br>
+                        Current password: <br>
+                        New password: <br>
+                        Retype new password: <br>
+                        passwd: password updated successfully
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">Password Policy Commands</div>
+                    <div class="example">
+                        passwd -l username    # Lock user account<br>
+                        passwd -u username    # Unlock user account<br>
+                        passwd -d username    # Delete password (dangerous)<br>
+                        passwd -e username    # Expire password immediately<br><br>
+                        
+                        # Example output:<br>
+                        $ sudo passwd -l testuser<br>
+                        passwd: password expiry information changed.<br><br>
+                        
+                        $ sudo passwd -u testuser<br>
+                        passwd: password expiry information changed.
+                    </div>
+                </div>
+
+                <div class="important">
+                    <strong>Best Practice:</strong> Use strong passwords with a combination of uppercase, lowercase, numbers, and special characters.
+                </div>
+            </div>
+
+            <div class="section" id="file-commands">
+                <h2>3. File Commands</h2>
+                <div class="description">
+                    File manipulation is fundamental in Linux. These commands help create, copy, move, and manage files and directories.
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">Basic File Operations</div>
+                    <div class="example">
+                        touch filename.txt        # Create empty file<br>
+                        cp source.txt dest.txt    # Copy file<br>
+                        mv oldname.txt newname.txt # Move/rename file<br>
+                        rm filename.txt           # Delete file<br>
+                        mkdir directory_name      # Create directory<br>
+                        rmdir directory_name      # Remove empty directory<br>
+                        rm -rf directory_name     # Remove directory and contents<br><br>
+                        
+                        # Example session:<br>
+                        $ touch newfile.txt<br>
+                        $ ls -l newfile.txt<br>
+                        -rw-r--r-- 1 tchen tchen 0 Jul 03 10:45 newfile.txt<br><br>
+                        
+                        $ cp newfile.txt backup.txt<br>
+                        $ ls<br>
+                        backup.txt  newfile.txt<br><br>
+                        
+                        $ mkdir testdir<br>
+                        $ ls -d testdir<br>
+                        testdir/
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">File Information</div>
+                    <div class="example">
+                        file filename.txt         # Display file type<br>
+                        stat filename.txt         # Display detailed file information<br>
+                        du -h filename.txt        # Display file size<br>
+                        find /path -name "*.txt"  # Find files by pattern<br><br>
+                        
+                        # Example output:<br>
+                        $ file document.txt<br>
+                        document.txt: ASCII text<br><br>
+                        
+                        $ file script.sh<br>
+                        script.sh: Bourne-Again shell script, ASCII text executable<br><br>
+                        
+                        $ du -h document.txt<br>
+                        4.0K    document.txt<br><br>
+                        
+                        $ find /home/tchen -name "*.txt"<br>
+                        /home/tchen/document.txt<br>
+                        /home/tchen/notes.txt<br>
+                        /home/tchen/backup.txt
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="passwd-file">
+                <h2>4. User Account Files (/etc/passwd)</h2>
+                <div class="description">
+                    The /etc/passwd file contains essential information about system users. Understanding its structure is crucial for system administration.
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">Viewing /etc/passwd</div>
+                    <div class="example">
+                        cat /etc/passwd<br>
+                        # Display all user accounts<br><br>
+                        
+                        grep "tchen" /etc/passwd<br>
+                        # Search for specific user<br><br>
+                        
+                        # Example output:<br>
+                        $ grep "tchen" /etc/passwd<br>
+                        tchen:x:1001:1001:Tony Chen,,,:/home/tchen:/bin/bash<br><br>
+                        
+                        $ head -5 /etc/passwd<br>
+                        root:x:0:0:root:/root:/bin/bash<br>
+                        daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin<br>
+                        bin:x:2:2:bin:/bin:/usr/sbin/nologin<br>
+                        sys:x:3:3:sys:/dev:/usr/sbin/nologin<br>
+                        sync:x:4:65534:sync:/bin:/bin/sync
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">passwd File Structure</div>
+                    <div class="example">
+                        username:password:UID:GID:GECOS:home_directory:shell<br><br>
+                        
+                        Example:<br>
+                        tchen:x:1001:1001:Tony Chen,,,:/home/tchen:/bin/bash<br>
+                        root:x:0:0:root:/root:/bin/bash<br>
+                        daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+                    </example>
+                </div>
+
+                <div class="important">
+                    <strong>Security Note:</strong> Modern systems use 'x' in the password field, with actual password hashes stored in /etc/shadow for security.
+                </div>
+            </div>
+
+            <div class="section" id="text-commands">
+                <h2>5. Text Processing Commands</h2>
+                <div class="description">
+                    Linux provides powerful text processing utilities for viewing, searching, and manipulating file contents.
+                </div>
+
+                <h3>cat Command</h3>
+                <div class="command-box">
+                    <div class="command-name">cat - Display File Contents</div>
+                    <div class="example">
+                        cat filename.txt          # Display entire file<br>
+                        cat file1.txt file2.txt   # Display multiple files<br>
+                        cat > newfile.txt         # Create file with input<br>
+                        cat file1.txt > file2.txt # Copy file content<br><br>
+                        
+                        # Example output:<br>
+                        $ cat sample.txt<br>
+                        This is line 1<br>
+                        This is line 2<br>
+                        This is line 3<br><br>
+                        
+                        $ cat file1.txt file2.txt<br>
+                        Contents of file1<br>
+                        Contents of file2
+                    </div>
+                </div>
+
+                <h3>head Command</h3>
+                <div class="command-box">
+                    <div class="command-name">head - Display First Lines</div>
+                    <div class="example">
+                        head filename.txt         # Display first 10 lines<br>
+                        head -n 5 filename.txt    # Display first 5 lines<br>
+                        head -n 20 /etc/passwd    # Show first 20 users<br>
+                        head -c 100 filename.txt  # Display first 100 characters<br><br>
+                        
+                        # Example output:<br>
+                        $ head -n 3 /etc/passwd<br>
+                        root:x:0:0:root:/root:/bin/bash<br>
+                        daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin<br>
+                        bin:x:2:2:bin:/bin:/usr/sbin/nologin<br><br>
+                        
+                        $ head -n 5 sample.txt<br>
+                        Line 1 of the file<br>
+                        Line 2 of the file<br>
+                        Line 3 of the file<br>
+                        Line 4 of the file<br>
+                        Line 5 of the file
+                    </div>
+                </div>
+
+                <h3>tail Command</h3>
+                <div class="command-box">
+                    <div class="command-name">tail - Display Last Lines</div>
+                    <div class="example">
+                        tail filename.txt         # Display last 10 lines<br>
+                        tail -n 15 filename.txt   # Display last 15 lines<br>
+                        tail -f /var/log/syslog   # Follow file changes (live monitoring)<br>
+                        tail -n +10 filename.txt  # Display from line 10 to end<br><br>
+                        
+                        # Example output:<br>
+                        $ tail -n 3 sample.txt<br>
+                        Line 18 of the file<br>
+                        Line 19 of the file<br>
+                        Line 20 of the file<br><br>
+                        
+                        $ tail -f /var/log/syslog<br>
+                        Jul  3 10:45:23 server systemd[1]: Started session-1.scope.<br>
+                        Jul  3 10:45:30 server kernel: [12345.678901] USB disconnect<br>
+                        # (continues to show new lines as they're added)
+                    </div>
+                </div>
+
+                <h3>wc Command</h3>
+                <div class="command-box">
+                    <div class="command-name">wc - Word Count</div>
+                    <div class="example">
+                        wc filename.txt           # Display lines, words, characters<br>
+                        wc -l filename.txt        # Count lines only<br>
+                        wc -w filename.txt        # Count words only<br>
+                        wc -c filename.txt        # Count characters only<br>
+                        wc -l /etc/passwd         # Count number of users<br><br>
+                        
+                        # Example output:<br>
+                        $ wc sample.txt<br>
+                        20  150  800 sample.txt<br>
+                        # (20 lines, 150 words, 800 characters)<br><br>
+                        
+                        $ wc -l /etc/passwd<br>
+                        45 /etc/passwd<br><br>
+                        
+                        $ wc -w document.txt<br>
+                        250 document.txt
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="listing">
+                <h2>6. Directory Listing Commands</h2>
+                <div class="description">
+                    The ls command family provides various ways to list and examine directory contents with different levels of detail.
+                </div>
+
+                <h3>Basic ls Command</h3>
+                <div class="command-box">
+                    <div class="command-name">ls - List Directory Contents</div>
+                    <div class="example">
+                        ls                        # List files in current directory<br>
+                        ls /home                  # List files in specific directory<br>
+                        ls *.txt                  # List files matching pattern<br>
+                        ls -a                     # Show hidden files (starting with .)<br>
+                        ls -A                     # Show hidden files except . and ..<br><br>
+                        
+                        # Example output:<br>
+                        $ ls<br>
+                        Documents  Downloads  Music  Pictures  Videos<br>
+                        file1.txt  file2.txt  script.sh<br><br>
+                        
+                        $ ls -a<br>
+                        .          ..         .bashrc    .profile<br>
+                        Documents  Downloads  Music      Pictures<br>
+                        Videos     file1.txt  file2.txt  script.sh
+                    </div>
+                </div>
+
+                <h3>ls -l Command (Long Format)</h3>
+                <div class="command-box">
+                    <div class="command-name">ls -l - Detailed File Information</div>
+                    <div class="example">
+                        ls -l<br>
+                        # Output format: permissions links owner group size date name<br><br>
+                        
+                        # Example output:<br>
+                        $ ls -l<br>
+                        total 32<br>
+                        -rw-r--r-- 1 tchen tchen 1024 Jul 03 10:30 document.txt<br>
+                        drwxr-xr-x 2 tchen tchen 4096 Jul 03 09:15 projects<br>
+                        -rwxr-xr-x 1 tchen tchen 8192 Jul 02 14:20 script.sh<br>
+                        -rw-r--r-- 1 tchen tchen  256 Jul 01 16:45 notes.txt<br>
+                        drwxr-xr-x 3 tchen tchen 4096 Jun 30 12:00 backup
+                    </div>
+                </div>
+
+                <h3>ls Command Variations</h3>
+                <div class="command-box">
+                    <div class="command-name">Advanced ls Options</div>
+                    <div class="example">
+                        ls -la                    # Long format including hidden files<br>
+                        ls -lh                    # Human-readable file sizes<br>
+                        ls -lt                    # Sort by modification time<br>
+                        ls -lS                    # Sort by file size<br>
+                        ls -lr                    # Reverse order<br>
+                        ls -lR                    # Recursive listing<br>
+                        ls -ld directory_name     # List directory itself, not contents<br><br>
+                        
+                        # Example output:<br>
+                        $ ls -lh<br>
+                        total 32K<br>
+                        -rw-r--r-- 1 tchen tchen 1.0K Jul 03 10:30 document.txt<br>
+                        drwxr-xr-x 2 tchen tchen 4.0K Jul 03 09:15 projects<br>
+                        -rwxr-xr-x 1 tchen tchen 8.0K Jul 02 14:20 script.sh<br><br>
+                        
+                        $ ls -ld /home/tchen<br>
+                        drwxr-xr-x 25 tchen tchen 4096 Jul 03 10:45 /home/tchen
+                    </div>
+                </div>
+
+                <div class="important">
+                    <strong>Permission Format:</strong> The first character indicates file type (- for file, d for directory, l for link), followed by three groups of rwx permissions for owner, group, and others.
+                </div>
+            </div>
+
+            <div class="section" id="history">
+                <h2>7. Command History</h2>
+                <div class="description">
+                    Linux maintains a history of executed commands, allowing users to review, repeat, and modify previous commands efficiently.
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">history - View Command History</div>
+                    <div class="example">
+                        history                   # Display all command history<br>
+                        history 10                # Display last 10 commands<br>
+                        history | grep "ls"       # Search history for specific command<br>
+                        history -c                # Clear command history<br><br>
+                        
+                        # Example output:<br>
+                        $ history 5<br>
+                        501  ls -l<br>
+                        502  cat /etc/passwd<br>
+                        503  head -n 5 sample.txt<br>
+                        504  wc -l /etc/passwd<br>
+                        505  history 5<br><br>
+                        
+                        $ history | grep "cat"<br>
+                        487  cat sample.txt<br>
+                        502  cat /etc/passwd<br>
+                        520  cat > newfile.txt
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">History Navigation</div>
+                    <div class="example">
+                        !!                        # Repeat last command<br>
+                        !n                        # Execute command number n<br>
+                        !string                   # Execute last command starting with string<br>
+                        !?string                  # Execute last command containing string<br>
+                        ^old^new                  # Replace 'old' with 'new' in last command<br><br>
+                        
+                        # Example usage:<br>
+                        $ ls -l<br>
+                        $ !!<br>
+                        ls -l    # (repeats the ls -l command)<br><br>
+                        
+                        $ !502<br>
+                        cat /etc/passwd    # (executes command #502)<br><br>
+                        
+                        $ !cat<br>
+                        cat /etc/passwd    # (executes last command starting with 'cat')
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">History File Management</div>
+                    <div class="example">
+                        echo $HISTFILE            # Display history file location<br>
+                        echo $HISTSIZE            # Display history size limit<br>
+                        history -w                # Write current session to history file<br>
+                        history -r                # Read history file into current session<br><br>
+                        
+                        # Example output:<br>
+                        $ echo $HISTFILE<br>
+                        /home/tchen/.bash_history<br><br>
+                        
+                        $ echo $HISTSIZE<br>
+                        1000<br><br>
+                        
+                        $ history -w<br>
+                        # (writes current session commands to .bash_history)
+                    </div>
+                </div>
+
+                <div class="important">
+                    <strong>Keyboard Shortcuts:</strong> Use Up/Down arrows to navigate history, Ctrl+R for reverse search, and Ctrl+G to cancel search.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>8. Additional Essential Commands</h2>
+                <div class="description">
+                    These additional commands complement the core file and text processing utilities for comprehensive system management.
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">System Information</div>
+                    <div class="example">
+                        whoami                    # Display current username<br>
+                        id                        # Display user and group IDs<br>
+                        pwd                       # Display current directory<br>
+                        uname -a                  # Display system information<br>
+                        df -h                     # Display disk usage<br>
+                        free -h                   # Display memory usage<br><br>
+                        
+                        # Example output:<br>
+                        $ whoami<br>
+                        tchen<br><br>
+                        
+                        $ id<br>
+                        uid=1001(tchen) gid=1001(tchen) groups=1001(tchen),27(sudo)<br><br>
+                        
+                        $ pwd<br>
+                        /home/tchen<br><br>
+                        
+                        $ df -h<br>
+                        Filesystem      Size  Used Avail Use% Mounted on<br>
+                        /dev/sda1        20G   12G  7.2G  63% /
+                    </div>
+                </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">Process Management</div>
+                    <div class="example">
+                        ps                        # Display running processes<br>
+                        ps aux                    # Display all processes<br>
+                        top                       # Display live process information<br>
+                        kill PID                  # Terminate process by ID<br>
+                        killall process_name      # Terminate process by name
+                    </div>
+                </div>
+
+                <div class="command-box">
+                    <div class="command-name">Text Search and Manipulation</div>
+                    <div class="example">
+                        grep "pattern" filename   # Search for text pattern<br>
+                        grep -i "pattern" file    # Case-insensitive search<br>
+                        grep -r "pattern" /path   # Recursive search<br>
+                        sort filename             # Sort file contents<br>
+                        uniq filename             # Remove duplicate lines<br>
+                        cut -d: -f1 /etc/passwd   # Extract specific fields
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 College of DuPage - Linux System Administration Review</p>
+        <p>Student: Tony Chen | Course Materials and Command Reference</p>
+    </div>
+
+    <script>
+        // Add click-to-copy functionality for code examples
+        document.querySelectorAll('.example').forEach(example => {
+            example.style.cursor = 'pointer';
+            example.title = 'Click to copy';
+            example.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalBg = this.style.backgroundColor;
+                    this.style.backgroundColor = '#4CAF50';
+                    setTimeout(() => {
+                        this.style.backgroundColor = originalBg;
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
