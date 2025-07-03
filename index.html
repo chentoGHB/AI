@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive HTML Index Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #228B22 0%, #006400 50%, #2F4F4F 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(47, 79, 79, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(0, 100, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="80" r="1.5" fill="white" opacity="0.1"/><circle cx="60" cy="40" r="1" fill="white" opacity="0.1"/></svg>'),
+                linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .cod-logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .chaparral-icon {
+            display: inline-block;
+            font-size: 2.5rem;
+            margin: 0 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cod-branding {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cod-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 10px;
+            color: #E8F5E8;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .add-form {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .add-form:hover {
+            border-color: #228B22;
+            background: #f1f5f9;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #228B22;
+            box-shadow: 0 0 0 3px rgba(34, 139, 34, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 8px rgba(34, 139, 34, 0.3);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #006400 0%, #228B22 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(34, 139, 34, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #2F4F4F 0%, #696969 100%);
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #696969 0%, #2F4F4F 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .categories-section {
+            margin-top: 40px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .links-grid {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .link-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .link-item:hover {
+            border-color: #4f46e5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.15);
+        }
+
+        .link-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .link-url {
+            color: #4f46e5;
+            text-decoration: none;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .link-url:hover {
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .link-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .export-import {
+            background: #f1f5f9;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .export-import h3 {
+            color: #374151;
+            margin-bottom: 15px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="cod-branding">
+                <div class="chaparral-icon">🏃‍♂️</div>
+                <div class="cod-title">College of DuPage</div>
+                <div class="chaparral-icon">🦅</div>
+            </div>
+            <h1>📚 HTML Index Manager</h1>
+            <p>Organize your HTML files with custom categories and links</p>
+            <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">
+                <span style="color: #E8F5E8;">🏫 COD.edu</span> • 
+                <span style="color: #E8F5E8;">Chaparral Pride</span> • 
+                <span style="color: #E8F5E8;">Forest Green & Gray</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="export-import">
+                <h3>📥 Import/Export</h3>
+                <button class="btn" onclick="exportData()">Export Data</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Import Data</button>
+                <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+            </div>
+
+            <div class="add-form">
+                <h2 style="margin-bottom: 20px; color: #374151;">➕ Add New Link</h2>
+                <form id="addLinkForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="linkName">Link Name</label>
+                            <input type="text" id="linkName" placeholder="Enter display name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="linkUrl">HTML File Path</label>
+                            <input type="text" id="linkUrl" placeholder="e.g., pages/about.html" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categorySelect">Category</label>
+                            <select id="categorySelect">
+                                <option value="">Select existing category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newCategory">Or Create New Category</label>
+                            <input type="text" id="newCategory" placeholder="Enter new category name">
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn">Add Link</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="categories-section">
+                <h2 style="margin-bottom: 30px; color: #374151;">📂 Categories & Links</h2>
+                <div id="categoriesContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3>No links added yet</h3>
+                        <p>Start by adding your first HTML file above</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class IndexManager {
+            constructor() {
+                this.links = this.loadFromStorage();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateCategorySelect();
+                this.renderCategories();
+            }
+
+            setupEventListeners() {
+                document.getElementById('addLinkForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addLink();
+                });
+            }
+
+            addLink() {
+                const linkName = document.getElementById('linkName').value.trim();
+                const linkUrl = document.getElementById('linkUrl').value.trim();
+                const categorySelect = document.getElementById('categorySelect').value;
+                const newCategory = document.getElementById('newCategory').value.trim();
+
+                if (!linkName || !linkUrl) {
+                    alert('Please fill in both link name and URL');
+                    return;
+                }
+
+                const category = newCategory || categorySelect || 'Uncategorized';
+
+                if (!this.links[category]) {
+                    this.links[category] = [];
+                }
+
+                // Check for duplicate links
+                const isDuplicate = this.links[category].some(link => 
+                    link.url === linkUrl || link.name === linkName
+                );
+
+                if (isDuplicate) {
+                    alert('A link with this name or URL already exists in this category');
+                    return;
+                }
+
+                this.links[category].push({
+                    name: linkName,
+                    url: linkUrl,
+                    id: Date.now().toString()
+                });
+
+                this.saveToStorage();
+                this.updateCategorySelect();
+                this.renderCategories();
+                this.clearForm();
+            }
+
+            deleteLink(category, linkId) {
+                if (confirm('Are you sure you want to delete this link?')) {
+                    this.links[category] = this.links[category].filter(link => link.id !== linkId);
+                    
+                    // Remove category if empty
+                    if (this.links[category].length === 0) {
+                        delete this.links[category];
+                    }
+
+                    this.saveToStorage();
+                    this.updateCategorySelect();
+                    this.renderCategories();
+                }
+            }
+
+            updateCategorySelect() {
+                const select = document.getElementById('categorySelect');
+                select.innerHTML = '<option value="">Select existing category</option>';
+                
+                Object.keys(this.links).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    select.appendChild(option);
+                });
+            }
+
+            renderCategories() {
+                const container = document.getElementById('categoriesContainer');
+                
+                if (Object.keys(this.links).length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📄</div>
+                            <h3>No links added yet</h3>
+                            <p>Start by adding your first HTML file above</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                Object.keys(this.links).sort().forEach(category => {
+                    const categoryCard = document.createElement('div');
+                    categoryCard.className = 'category-card';
+                    
+                    const linksHTML = this.links[category].map(link => `
+                        <div class="link-item">
+                            <div class="link-title">${this.escapeHtml(link.name)}</div>
+                            <a href="${this.escapeHtml(link.url)}" class="link-url" target="_blank">
+                                ${this.escapeHtml(link.url)}
+                            </a>
+                            <button class="btn btn-danger delete-btn" onclick="indexManager.deleteLink('${category}', '${link.id}')">
+                                ×
+                            </button>
+                        </div>
+                    `).join('');
+
+                    categoryCard.innerHTML = `
+                        <div class="category-header">
+                            <div class="category-title">${this.escapeHtml(category)}</div>
+                            <div class="category-count">${this.links[category].length} link${this.links[category].length !== 1 ? 's' : ''}</div>
+                        </div>
+                        <div class="links-grid">
+                            ${linksHTML}
+                        </div>
+                    `;
+
+                    container.appendChild(categoryCard);
+                });
+            }
+
+            clearForm() {
+                document.getElementById('addLinkForm').reset();
+            }
+
+            saveToStorage() {
+                try {
+                    const data = JSON.stringify(this.links);
+                    // Since we can't use localStorage, we'll keep data in memory
+                    // In a real environment, this would save to localStorage
+                    console.log('Data saved to memory:', data);
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                }
+            }
+
+            loadFromStorage() {
+                try {
+                    // Since we can't use localStorage, return empty object
+                    // In a real environment, this would load from localStorage
+                    return {};
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    return {};
+                }
+            }
+
+            exportData() {
+                const data = JSON.stringify(this.links, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'html-index-data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (confirm('This will replace all existing data. Continue?')) {
+                            this.links = data;
+                            this.saveToStorage();
+                            this.updateCategorySelect();
+                            this.renderCategories();
+                        }
+                    } catch (error) {
+                        alert('Error importing data: Invalid JSON file');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize the application
+        const indexManager = new IndexManager();
+
+        // Global functions for inline event handlers
+        function exportData() {
+            indexManager.exportData();
+        }
+
+        function importData(event) {
+            indexManager.importData(event);
+        }
+
+        function clearForm() {
+            indexManager.clearForm();
+        }
+    </script>
+</body>
+</html>
