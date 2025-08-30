@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPv4 DHCP Scope Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .input-section {
+            padding: 40px;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .output-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2196F3;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .subnet-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .result-value {
+            font-family: 'Courier New', monospace;
+            color: #2196F3;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .subnet-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>IPv4 DHCP Scope Calculator</h1>
+            <p style="font-size: 1.2em; margin-bottom: 15px; font-weight: 500;">College of DuPage, CIT<br>by Tony Chen</p>
+            <p>Configure your DHCP scope with optimal settings and IP range calculations</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <h2 class="section-title">Configuration Input</h2>
+                
+                <div class="form-group">
+                    <label for="scopeName">Scope Name:</label>
+                    <input type="text" id="scopeName" placeholder="e.g., Main Office Network">
+                </div>
+                
+                <div class="form-group">
+                    <label for="domainName">Domain Name:</label>
+                    <input type="text" id="domainName" placeholder="e.g., company.local">
+                </div>
+                
+                <div class="form-group">
+                    <div class="subnet-row">
+                        <div>
+                            <label for="networkAddress">Network Address:</label>
+                            <input type="text" id="networkAddress" placeholder="e.g., 192.168.1.0">
+                        </div>
+                        <div>
+                            <label for="subnetMask">Subnet Mask (bits):</label>
+                            <select id="subnetMask">
+                                <option value="24" selected>/24 (255.255.255.0)</option>
+                                <option value="23">/23 (255.255.254.0)</option>
+                                <option value="25">/25 (255.255.255.128)</option>
+                                <option value="26">/26 (255.255.255.192)</option>
+                                <option value="27">/27 (255.255.255.224)</option>
+                                <option value="28">/28 (255.255.255.240)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dhcpServerIP">DHCP Server IP Address:</label>
+                    <input type="text" id="dhcpServerIP" placeholder="e.g., 192.168.1.10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dnsServerIP">DNS Server IP Addresses:</label>
+                    <input type="text" id="dnsServerIP" placeholder="e.g., 192.168.1.1, 8.8.8.8, 8.8.4.4">
+                    <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">
+                        Enter multiple DNS servers separated by commas (Primary, Secondary, etc.)
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="defaultGateway">Default Gateway (optional):</label>
+                    <input type="text" id="defaultGateway" placeholder="Leave blank to use first available address">
+                    <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">
+                        If not specified, will use the first usable IP address
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exclusionCount">Exclude First N Addresses:</label>
+                    <input type="number" id="exclusionCount" value="20" min="1" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="excludeLastCount">Exclude Last N Addresses:</label>
+                    <input type="number" id="excludeLastCount" value="5" min="0" max="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customExclusions">Custom Exclusion Ranges (optional):</label>
+                    <input type="text" id="customExclusions" placeholder="e.g., 192.168.1.100-192.168.1.110, 192.168.1.200">
+                    <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">
+                        Enter single IPs or ranges separated by commas
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exclusionPreset">Quick Exclusion Presets:</label>
+                    <select id="exclusionPreset" onchange="applyExclusionPreset()">
+                        <option value="custom">Custom Settings</option>
+                        <option value="small">Small Network (First 10, Last 5)</option>
+                        <option value="medium">Medium Network (First 20, Last 10)</option>
+                        <option value="large">Large Network (First 50, Last 20)</option>
+                        <option value="server">Server Segment (First 100, Last 10)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="leaseDuration">Lease Duration (days):</label>
+                    <input type="number" id="leaseDuration" value="8" min="1" max="365">
+                </div>
+                
+                <button class="calculate-btn" onclick="calculateScope()">Calculate DHCP Scope</button>
+                
+                <div class="info-box">
+                    <strong>💡 Tips:</strong><br>
+                    • /24 subnet provides 254 usable addresses<br>
+                    • Use presets for common exclusion patterns<br>
+                    • Exclude first addresses for static servers/infrastructure<br>
+                    • Exclude last addresses for printers/devices<br>
+                    • Custom ranges: use format "192.168.1.100-192.168.1.110"<br>
+                    • Multiple DNS: separate with commas (Primary, Secondary, etc.)<br>
+                    • Default gateway: leave blank to auto-assign first available IP
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <h2 class="section-title">DHCP Scope Configuration</h2>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function ipToNumber(ip) {
+            return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
+        }
+        
+        function numberToIP(num) {
+            return [
+                (num >>> 24) & 255,
+                (num >>> 16) & 255,
+                (num >>> 8) & 255,
+                num & 255
+            ].join('.');
+        }
+        
+        function validateIP(ip) {
+            const regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!regex.test(ip)) return false;
+            
+            return ip.split('.').every(octet => {
+                const num = parseInt(octet);
+                return num >= 0 && num <= 255;
+            });
+        }
+        
+        function validateMultipleDNS(dnsString) {
+            if (!dnsString.trim()) return { valid: true, servers: [] };
+            
+            const servers = dnsString.split(',').map(ip => ip.trim()).filter(ip => ip);
+            const invalidServers = [];
+            
+            for (const server of servers) {
+                if (!validateIP(server)) {
+                    invalidServers.push(server);
+                }
+            }
+            
+            return {
+                valid: invalidServers.length === 0,
+                servers: servers,
+                invalidServers: invalidServers
+            };
+        }
+        
+        function applyExclusionPreset() {
+            const preset = document.getElementById('exclusionPreset').value;
+            const firstExclusion = document.getElementById('exclusionCount');
+            const lastExclusion = document.getElementById('excludeLastCount');
+            
+            switch(preset) {
+                case 'small':
+                    firstExclusion.value = 10;
+                    lastExclusion.value = 5;
+                    break;
+                case 'medium':
+                    firstExclusion.value = 20;
+                    lastExclusion.value = 10;
+                    break;
+                case 'large':
+                    firstExclusion.value = 50;
+                    lastExclusion.value = 20;
+                    break;
+                case 'server':
+                    firstExclusion.value = 100;
+                    lastExclusion.value = 10;
+                    break;
+            }
+        }
+        
+        function parseCustomExclusions(exclusionStr, networkNum, totalHosts) {
+            if (!exclusionStr.trim()) return [];
+            
+            const exclusions = [];
+            const ranges = exclusionStr.split(',').map(s => s.trim());
+            
+            for (const range of ranges) {
+                if (range.includes('-')) {
+                    // Handle IP range
+                    const [startIP, endIP] = range.split('-').map(s => s.trim());
+                    if (validateIP(startIP) && validateIP(endIP)) {
+                        const startNum = ipToNumber(startIP);
+                        const endNum = ipToNumber(endIP);
+                        for (let i = startNum; i <= endNum; i++) {
+                            if (i > networkNum && i < networkNum + totalHosts - 1) {
+                                exclusions.push(i);
+                            }
+                        }
+                    }
+                } else {
+                    // Handle single IP
+                    if (validateIP(range)) {
+                        const ipNum = ipToNumber(range);
+                        if (ipNum > networkNum && ipNum < networkNum + totalHosts - 1) {
+                            exclusions.push(ipNum);
+                        }
+                    }
+                }
+            }
+            
+            return [...new Set(exclusions)].sort((a, b) => a - b);
+        }
+        
+        function calculateScope() {
+            const scopeName = document.getElementById('scopeName').value;
+            const domainName = document.getElementById('domainName').value;
+            const dhcpServerIP = document.getElementById('dhcpServerIP').value;
+            const dnsServerIP = document.getElementById('dnsServerIP').value;
+            const defaultGatewayInput = document.getElementById('defaultGateway').value.trim();
+            const networkAddress = document.getElementById('networkAddress').value;
+            const subnetBits = parseInt(document.getElementById('subnetMask').value);
+            const exclusionCount = parseInt(document.getElementById('exclusionCount').value);
+            const excludeLastCount = parseInt(document.getElementById('excludeLastCount').value);
+            const customExclusions = document.getElementById('customExclusions').value;
+            const leaseDuration = parseInt(document.getElementById('leaseDuration').value);
+            
+            const resultsDiv = document.getElementById('results');
+            
+            // Validate inputs
+            if (!scopeName || !domainName || !networkAddress) {
+                resultsDiv.innerHTML = '<div class="error">Please fill in all required fields.</div>';
+                return;
+            }
+            
+            if (!validateIP(networkAddress)) {
+                resultsDiv.innerHTML = '<div class="error">Invalid network address format.</div>';
+                return;
+            }
+            
+            if (dhcpServerIP && !validateIP(dhcpServerIP)) {
+                resultsDiv.innerHTML = '<div class="error">Invalid DHCP server IP address format.</div>';
+                return;
+            }
+            
+            // Validate DNS servers
+            const dnsValidation = validateMultipleDNS(dnsServerIP);
+            if (!dnsValidation.valid) {
+                resultsDiv.innerHTML = `<div class="error">Invalid DNS server IP address(es): ${dnsValidation.invalidServers.join(', ')}</div>`;
+                return;
+            }
+            
+            // Validate default gateway if provided
+            if (defaultGatewayInput && !validateIP(defaultGatewayInput)) {
+                resultsDiv.innerHTML = '<div class="error">Invalid default gateway IP address format.</div>';
+                return;
+            }
+            
+            // Calculate network details
+            const hostBits = 32 - subnetBits;
+            const totalHosts = Math.pow(2, hostBits);
+            const usableHosts = totalHosts - 2; // Subtract network and broadcast
+            
+            const networkNum = ipToNumber(networkAddress);
+            const subnetMaskNum = (0xFFFFFFFF << hostBits) >>> 0;
+            const subnetMaskStr = numberToIP(subnetMaskNum);
+            
+            // Calculate IP ranges
+            const firstUsableNum = networkNum + 1;
+            const lastUsableNum = networkNum + totalHosts - 2;
+            const broadcastNum = networkNum + totalHosts - 1;
+            
+            const firstUsableIP = numberToIP(firstUsableNum);
+            const lastUsableIP = numberToIP(lastUsableNum);
+            const broadcastIP = numberToIP(broadcastNum);
+            
+            // Calculate all exclusions
+            const excludedIPs = new Set();
+            
+            // Exclude first N addresses
+            for (let i = 0; i < exclusionCount; i++) {
+                excludedIPs.add(firstUsableNum + i);
+            }
+            
+            // Exclude last N addresses
+            for (let i = 0; i < excludeLastCount; i++) {
+                excludedIPs.add(lastUsableNum - i);
+            }
+            
+            // Parse and add custom exclusions
+            const customExcluded = parseCustomExclusions(customExclusions, networkNum, totalHosts);
+            customExcluded.forEach(ip => excludedIPs.add(ip));
+            
+            // Find available ranges for DHCP pool
+            const availableIPs = [];
+            for (let i = firstUsableNum; i <= lastUsableNum; i++) {
+                if (!excludedIPs.has(i)) {
+                    availableIPs.push(i);
+                }
+            }
+            
+            // Calculate pool ranges
+            let poolStartIP = '';
+            let poolEndIP = '';
+            let poolSize = availableIPs.length;
+            
+            if (availableIPs.length > 0) {
+                poolStartIP = numberToIP(Math.min(...availableIPs));
+                poolEndIP = numberToIP(Math.max(...availableIPs));
+            }
+            
+            // Determine default gateway
+            let defaultGateway = '';
+            let gatewaySource = '';
+            
+            if (defaultGatewayInput) {
+                // Validate that custom gateway is within the network range
+                const gatewayNum = ipToNumber(defaultGatewayInput);
+                if (gatewayNum >= firstUsableNum && gatewayNum <= lastUsableNum) {
+                    defaultGateway = defaultGatewayInput;
+                    gatewaySource = 'Custom';
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">Default gateway must be within the network range.</div>';
+                    return;
+                }
+            } else {
+                // Use first usable IP as default gateway
+                defaultGateway = firstUsableIP;
+                gatewaySource = 'Auto (First available)';
+            }
+            
+            // Generate exclusion summary
+            const totalExcluded = excludedIPs.size;
+            const exclusionSummary = [];
+            
+            if (exclusionCount > 0) {
+                exclusionSummary.push(`First ${exclusionCount} addresses`);
+            }
+            if (excludeLastCount > 0) {
+                exclusionSummary.push(`Last ${excludeLastCount} addresses`);
+            }
+            if (customExcluded.length > 0) {
+                exclusionSummary.push(`${customExcluded.length} custom exclusions`);
+            }
+            
+            // Generate results
+            resultsDiv.innerHTML = `
+                <div class="result-card">
+                    <div class="result-item">
+                        <span class="result-label">Scope Name:</span>
+                        <span class="result-value">${scopeName}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Network Address:</span>
+                        <span class="result-value">${networkAddress}/${subnetBits}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Subnet Mask:</span>
+                        <span class="result-value">${subnetMaskStr}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Broadcast Address:</span>
+                        <span class="result-value">${broadcastIP}</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3 style="margin-bottom: 15px; color: #333;">DHCP Pool Configuration</h3>
+                    ${poolSize > 0 ? `
+                    <div class="result-item">
+                        <span class="result-label">Pool Start IP:</span>
+                        <span class="result-value">${poolStartIP}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Pool End IP:</span>
+                        <span class="result-value">${poolEndIP}</span>
+                    </div>` : ''}
+                    <div class="result-item">
+                        <span class="result-label">Available Addresses:</span>
+                        <span class="result-value">${poolSize}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Exclusions:</span>
+                        <span class="result-value">${totalExcluded}</span>
+                    </div>
+                    ${exclusionSummary.length > 0 ? `
+                    <div class="result-item">
+                        <span class="result-label">Exclusion Types:</span>
+                        <span class="result-value">${exclusionSummary.join(', ')}</span>
+                    </div>` : ''}
+                </div>
+                
+                <div class="result-card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Network Services</h3>
+                    <div class="result-item">
+                        <span class="result-label">Default Gateway:</span>
+                        <span class="result-value">${defaultGateway} <small style="color: #666; font-weight: normal;">(${gatewaySource})</small></span>
+                    </div>
+                    ${dnsValidation.servers.length > 0 ? `
+                    <div class="result-item">
+                        <span class="result-label">DNS Servers:</span>
+                        <span class="result-value">${dnsValidation.servers.map((server, index) => 
+                            `${index === 0 ? 'Primary: ' : index === 1 ? 'Secondary: ' : `DNS ${index + 1}: `}${server}`
+                        ).join('<br>')}</span>
+                    </div>` : ''}
+                    ${dhcpServerIP ? `<div class="result-item">
+                        <span class="result-label">DHCP Server:</span>
+                        <span class="result-value">${dhcpServerIP}</span>
+                    </div>` : ''}
+                    <div class="result-item">
+                        <span class="result-label">Domain Name:</span>
+                        <span class="result-value">${domainName}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Lease Duration:</span>
+                        <span class="result-value">${leaseDuration} days</span>
+                    </div>
+                </div>
+                
+                ${poolSize < 50 && poolSize > 0 ? `<div class="warning">
+                    <strong>⚠️ Warning:</strong> The available DHCP pool size (${poolSize}) is quite small. Consider reducing exclusions or using a larger subnet.
+                </div>` : ''}
+                
+                ${poolSize === 0 ? `<div class="error">
+                    <strong>❌ Error:</strong> No IP addresses available for DHCP pool! All addresses have been excluded.
+                </div>` : ''}
+                
+                <div class="info-box">
+                    <strong>📋 Summary:</strong><br>
+                    • Total subnet capacity: ${totalHosts} addresses<br>
+                    • Usable addresses: ${usableHosts}<br>
+                    • Total exclusions: ${totalExcluded}<br>
+                    • Available for DHCP: ${poolSize}
+                </div>
+            `;
+        }
+        
+        // Auto-calculate on Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateScope();
+            }
+        });
+        
+        // Set default values for demonstration
+        window.onload = function() {
+            document.getElementById('scopeName').value = 'Main Office Network';
+            document.getElementById('domainName').value = 'company.local';
+            document.getElementById('dhcpServerIP').value = '192.168.1.10';
+            document.getElementById('dnsServerIP').value = '192.168.1.1, 8.8.8.8, 8.8.4.4';
+            document.getElementById('networkAddress').value = '192.168.1.0';
+            // defaultGateway left blank to demonstrate auto-assignment
+        };
+    </script>
+</body>
+</html>
