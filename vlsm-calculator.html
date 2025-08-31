@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced VLSM Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4b5563;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+        .subnet-requirement {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e5e7eb;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .subnet-requirement:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .subnet-requirement-header {
+            display: grid;
+            grid-template-columns: auto 1fr 150px auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .subnet-number {
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 15px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #f0f4ff, #e0e7ff);
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .mode-btn strong {
+            display: block;
+            color: var(--dark);
+            font-size: 0.95em;
+        }
+
+        .mode-btn small {
+            font-size: 0.75em;
+            color: #6b7280;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            margin-top: 10px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .allocation-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .allocation-table thead {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .allocation-table th, .allocation-table td {
+            padding: 14px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .allocation-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.3s ease;
+        }
+
+        .allocation-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .allocation-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .allocation-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .badge-optimal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .visualization {
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--dark);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .ip-block {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .subnet-block {
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .subnet-block:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subnet-block:last-child {
+            border-right: none;
+        }
+
+        .subnet-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .subnet-info {
+            font-size: 0.75em;
+            opacity: 0.9;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid var(--danger);
+            display: none;
+        }
+
+        .success {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--success);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .unused-space {
+            background: repeating-linear-gradient(
+                45deg,
+                #f3f4f6,
+                #f3f4f6 10px,
+                #e5e7eb 10px,
+                #e5e7eb 20px
+            );
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subnet-requirement-header {
+                grid-template-columns: auto 1fr auto;
+                gap: 10px;
+            }
+
+            .subnet-requirement-header input:nth-child(3) {
+                grid-column: span 3;
+                margin-top: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-btn {
+                flex-direction: column;
+                text-align: center;
+                padding: 10px;
+            }
+
+            .mode-btn small {
+                display: none;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="color: #6366f1; font-weight: 600; font-size: 1.3em; margin-bottom: 5px;">
+                College of DuPage - CIT Department
+            </div>
+            <div style="color: #8b5cf6; font-size: 1.15em;">
+                Developed by Tony Chen
+            </div>
+        </div>
+        
+        <h1>🌐 Advanced VLSM Calculator</h1>
+        <p class="subtitle">Variable Length Subnet Masking - Optimize your IP address allocation</p>
+
+        <div class="main-grid">
+            <div class="section">
+                <h2>
+                    <span class="icon">📍</span>
+                    Network Configuration
+                </h2>
+                <div class="input-group">
+                    <label for="networkIp">Main Network IP Address</label>
+                    <input type="text" id="networkIp" placeholder="192.168.0.0" value="192.168.0.0" onchange="autoSetCidr()">
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="networkCidr">
+                            CIDR Prefix
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">The number of network bits (e.g., /24 for 255.255.255.0)</span>
+                            </span>
+                        </label>
+                        <input type="number" id="networkCidr" placeholder="24" value="24" min="0" max="32" onchange="updateSubnetMask()">
+                    </div>
+                    <div class="input-group">
+                        <label for="subnetMask">Subnet Mask</label>
+                        <input type="text" id="subnetMask" placeholder="255.255.255.0" value="255.255.255.0" onchange="updateCidrFromMask()">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="sortMethod">Allocation Strategy</label>
+                    <select id="sortMethod">
+                        <option value="largest">Largest First (Recommended)</option>
+                        <option value="smallest">Smallest First</option>
+                        <option value="sequential">Sequential (As Entered)</option>
+                        <option value="alphabetical">Alphabetical by Name</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon">🏢</span>
+                    Quick Templates
+                </h2>
+                <div class="input-group">
+                    <label>Load Preset Configuration</label>
+                    <select id="template" onchange="loadTemplate()">
+                        <option value="">-- Select Template --</option>
+                        <option value="small-office">Small Office (5 subnets)</option>
+                        <option value="enterprise">Enterprise (10 subnets)</option>
+                        <option value="campus">Campus Network (8 subnets)</option>
+                        <option value="datacenter">Data Center (12 subnets)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Network Summary</label>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>IP Class Detected:</span>
+                            <strong id="ipClass">Class C</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Total IPs Available:</span>
+                            <strong id="totalAvailable">256</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Maximum Subnets:</span>
+                            <strong id="maxSubnets">~64</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>
+                <span class="icon">📊</span>
+                Subnet Requirements
+            </h2>
+            
+            <!-- Mode Selection -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 8px;">
+                <button id="hostBasedBtn" class="mode-btn active" onclick="switchMode('host-based')">
+                    <span style="font-size: 1.2em;">👥</span>
+                    <div>
+                        <strong>Host-Based</strong>
+                        <small style="display: block; opacity: 0.8;">Specify hosts per subnet</small>
+                    </div>
+                </button>
+                <button id="subnetBasedBtn" class="mode-btn" onclick="switchMode('subnet-based')">
+                    <span style="font-size: 1.2em;">🔢</span>
+                    <div>
+                        <strong>Subnet-Based</strong>
+                        <small style="display: block; opacity: 0.8;">Divide into equal subnets</small>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Host-Based Requirements -->
+            <div id="hostBasedRequirements" style="display: block;">
+                <div id="subnetRequirements">
+                    <div class="subnet-requirement">
+                        <div class="subnet-requirement-header">
+                            <span class="subnet-number">1</span>
+                            <input type="text" placeholder="Subnet Name (e.g., IT Department)" class="subnet-name-input">
+                            <input type="number" placeholder="Hosts needed" class="hosts-input" min="1">
+                            <button class="btn btn-danger" onclick="removeSubnet(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-add" onclick="addSubnet()">+ Add Subnet</button>
+            </div>
+
+            <!-- Subnet-Based Requirements -->
+            <div id="subnetBasedRequirements" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="input-group">
+                        <label for="numSubnets">Number of Subnets Needed</label>
+                        <input type="number" id="numSubnets" placeholder="8" value="8" min="2" max="1024" onchange="updateSubnetPreview()">
+                    </div>
+                    <div class="input-group">
+                        <label for="subnetNaming">Subnet Naming Pattern</label>
+                        <select id="subnetNaming" onchange="updateSubnetPreview()">
+                            <option value="numeric">Subnet 1, Subnet 2, ...</option>
+                            <option value="department">Department A, B, C, ...</option>
+                            <option value="floor">Floor 1, Floor 2, ...</option>
+                            <option value="vlan">VLAN 10, VLAN 20, ...</option>
+                            <option value="custom">Custom Prefix</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="customPrefixDiv" style="display: none; margin-bottom: 20px;">
+                    <div class="input-group">
+                        <label for="customPrefix">Custom Prefix</label>
+                        <input type="text" id="customPrefix" placeholder="Subnet" value="Subnet" onchange="updateSubnetPreview()">
+                    </div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <strong style="display: block; margin-bottom: 10px;">Preview:</strong>
+                    <div id="subnetPreview" style="color: #6b7280; font-size: 0.9em;">
+                        Will create 8 equal subnets<br>
+                        Each subnet: /27 (30 usable hosts)<br><br>
+                        First 3 subnets will be named:<br>
+                        • Subnet 1<br>
+                        • Subnet 2<br>
+                        • Subnet 3<br>
+                        • ... and 5 more
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="calculate()">
+                    <span>⚡</span> Calculate
+                </button>
+                <button class="btn" onclick="clearAll()" style="background: #6b7280; color: white;">
+                    <span>🔄</span> Clear All
+                </button>
+                <button class="btn" onclick="exportConfig()" style="background: #059669; color: white;">
+                    <span>📥</span> Export Config
+                </button>
+            </div>
+            
+            <div class="error" id="errorMsg"></div>
+        </div>
+
+        <div class="results-section" id="results">
+            <div class="success">
+                <strong>✅ VLSM Calculation Complete!</strong> Your network has been efficiently subnetted using Variable Length Subnet Masking.
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Subnets Created</div>
+                    <div class="stat-value" id="subnetsCreated">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Hosts</div>
+                    <div class="stat-value" id="totalHosts">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">IPs Used</div>
+                    <div class="stat-value" id="ipsUsed">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Efficiency</div>
+                    <div class="stat-value" id="efficiency">0%</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>IP Space Utilization</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar">0%</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Subnet Allocations</h2>
+                <table class="allocation-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Subnet Name</th>
+                            <th>Network</th>
+                            <th>Subnet Mask</th>
+                            <th>Hosts Needed</th>
+                            <th>Hosts Available</th>
+                            <th>First Host</th>
+                            <th>Last Host</th>
+                            <th>Broadcast</th>
+                            <th>Efficiency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allocationTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="visualization">
+                <h2 style="margin-bottom: 20px;">Visual IP Space Allocation</h2>
+                <div id="ipVisualization"></div>
+                <div style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background: #3b82f6; border-radius: 4px;"></div>
+                        <span style="font-size: 0.9em;">Allocated Subnets</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background: repeating-linear-gradient(45deg, #6b7280, #6b7280 5px, #4b5563 5px, #4b5563 10px); border-radius: 4px;"></div>
+                        <span style="font-size: 0.9em;">Unused Space</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Core networking functions
+        function ipToInt(ip) {
+            const parts = ip.split('.').map(Number);
+            return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
+        }
+
+        function intToIp(int) {
+            return [
+                (int >>> 24) & 255,
+                (int >>> 16) & 255,
+                (int >>> 8) & 255,
+                int & 255
+            ].join('.');
+        }
+
+        function cidrToMask(cidr) {
+            const mask = 0xffffffff << (32 - cidr);
+            return intToIp(mask >>> 0);
+        }
+
+        function maskToCidr(mask) {
+            const parts = mask.split('.').map(Number);
+            let cidr = 0;
+            
+            for (const part of parts) {
+                if (part === 255) {
+                    cidr += 8;
+                } else if (part === 0) {
+                    break;
+                } else {
+                    // Count the number of 1 bits
+                    let temp = part;
+                    while (temp & 0x80) {
+                        cidr++;
+                        temp <<= 1;
+                    }
+                    break;
+                }
+            }
+            return cidr;
+        }
+
+        function validateIp(ip) {
+            const parts = ip.split('.');
+            if (parts.length !== 4) return false;
+            return parts.every(part => {
+                const num = parseInt(part);
+                return !isNaN(num) && num >= 0 && num <= 255;
+            });
+        }
+
+        function validateSubnetMask(mask) {
+            if (!validateIp(mask)) return false;
+            
+            const parts = mask.split('.').map(Number);
+            let foundZero = false;
+            
+            for (const part of parts) {
+                if (foundZero && part !== 0) return false; // Can't have 1s after 0s
+                
+                if (part !== 255) {
+                    foundZero = true;
+                    // Check if it's a valid subnet octet (must be contiguous 1s followed by 0s)
+                    const validOctets = [0, 128, 192, 224, 240, 248, 252, 254, 255];
+                    if (!validOctets.includes(part)) return false;
+                }
+            }
+            return true;
+        }
+
+        function getIpClass(ip) {
+            const firstOctet = parseInt(ip.split('.')[0]);
+            if (firstOctet >= 1 && firstOctet <= 126) return 'A';
+            if (firstOctet >= 128 && firstOctet <= 191) return 'B';
+            if (firstOctet >= 192 && firstOctet <= 223) return 'C';
+            if (firstOctet >= 224 && firstOctet <= 239) return 'D';
+            if (firstOctet >= 240 && firstOctet <= 255) return 'E';
+            return 'Invalid';
+        }
+
+        function autoSetCidr() {
+            const ipInput = document.getElementById('networkIp').value.trim();
+            if (!validateIp(ipInput)) return;
+            
+            const ipClass = getIpClass(ipInput);
+            document.getElementById('ipClass').textContent = 'Class ' + ipClass;
+            
+            const defaultCidr = getDefaultCidrForClass(ipInput);
+            document.getElementById('networkCidr').value = defaultCidr;
+            document.getElementById('subnetMask').value = cidrToMask(defaultCidr);
+            updateNetworkInfo();
+        }
+
+        function updateSubnetMask() {
+            const cidr = parseInt(document.getElementById('networkCidr').value);
+            if (isNaN(cidr) || cidr < 0 || cidr > 32) return;
+            
+            document.getElementById('subnetMask').value = cidrToMask(cidr);
+            updateNetworkInfo();
+        }
+
+        function updateCidrFromMask() {
+            const mask = document.getElementById('subnetMask').value.trim();
+            if (!validateSubnetMask(mask)) {
+                alert('Invalid subnet mask format');
+                return;
+            }
+            
+            const cidr = maskToCidr(mask);
+            document.getElementById('networkCidr').value = cidr;
+            updateNetworkInfo();
+        }
+
+        let subnetCounter = 1;
+        let currentMode = 'host-based';
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.getElementById('hostBasedBtn').classList.toggle('active', mode === 'host-based');
+            document.getElementById('subnetBasedBtn').classList.toggle('active', mode === 'subnet-based');
+            
+            // Show/hide appropriate sections
+            document.getElementById('hostBasedRequirements').style.display = mode === 'host-based' ? 'block' : 'none';
+            document.getElementById('subnetBasedRequirements').style.display = mode === 'subnet-based' ? 'block' : 'none';
+            
+            // Clear error messages
+            document.getElementById('errorMsg').style.display = 'none';
+            
+            // Update preview if switching to subnet-based
+            if (mode === 'subnet-based') {
+                updateSubnetPreview();
+            }
+        }
+
+        function updateSubnetPreview() {
+            const numSubnets = parseInt(document.getElementById('numSubnets').value) || 8;
+            const naming = document.getElementById('subnetNaming').value;
+            const customPrefixDiv = document.getElementById('customPrefixDiv');
+            const previewDiv = document.getElementById('subnetPreview');
+            
+            // Show/hide custom prefix input
+            customPrefixDiv.style.display = naming === 'custom' ? 'block' : 'none';
+            
+            // Calculate subnet size
+            const cidr = parseInt(document.getElementById('networkCidr').value) || 24;
+            const totalIps = Math.pow(2, 32 - cidr);
+            
+            // Find required subnet bits
+            let subnetBits = Math.ceil(Math.log2(numSubnets));
+            const newCidr = cidr + subnetBits;
+            
+            if (newCidr > 30) {
+                previewDiv.innerHTML = '<span style="color: #ef4444;">⚠️ Too many subnets for the available network space</span>';
+                return;
+            }
+            
+            const hostsPerSubnet = Math.pow(2, 32 - newCidr) - 2;
+            
+            // Generate preview
+            let preview = `Will create ${numSubnets} equal subnets<br>`;
+            preview += `Each subnet: /${newCidr} (${hostsPerSubnet.toLocaleString()} usable hosts)<br><br>`;
+            preview += `First 3 subnets will be named:<br>`;
+            
+            const names = generateSubnetNames(naming, 3);
+            names.forEach((name, i) => {
+                preview += `• ${name}<br>`;
+            });
+            
+            if (numSubnets > 3) {
+                preview += `• ... and ${numSubnets - 3} more`;
+            }
+            
+            previewDiv.innerHTML = preview;
+        }
+
+        function generateSubnetNames(pattern, count) {
+            const names = [];
+            const customPrefix = document.getElementById('customPrefix').value || 'Subnet';
+            
+            for (let i = 0; i < count; i++) {
+                switch(pattern) {
+                    case 'numeric':
+                        names.push(`Subnet ${i + 1}`);
+                        break;
+                    case 'department':
+                        const depts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
+                        names.push(`Department ${depts[i % depts.length]}`);
+                        break;
+                    case 'floor':
+                        names.push(`Floor ${i + 1}`);
+                        break;
+                    case 'vlan':
+                        names.push(`VLAN ${10 + (i * 10)}`);
+                        break;
+                    case 'custom':
+                        names.push(`${customPrefix} ${i + 1}`);
+                        break;
+                    default:
+                        names.push(`Subnet ${i + 1}`);
+                }
+            }
+            return names;
+        }
+
+        function calculate() {
+            if (currentMode === 'host-based') {
+                calculateVLSM();
+            } else {
+                calculateEqualSubnets();
+            }
+        }
+
+        function calculateEqualSubnets() {
+            const errorDiv = document.getElementById('errorMsg');
+            const resultsDiv = document.getElementById('results');
+            errorDiv.style.display = 'none';
+
+            const networkIp = document.getElementById('networkIp').value.trim();
+            const networkCidr = parseInt(document.getElementById('networkCidr').value);
+            const numSubnets = parseInt(document.getElementById('numSubnets').value) || 8;
+            const naming = document.getElementById('subnetNaming').value;
+
+            if (!validateIp(networkIp)) {
+                errorDiv.textContent = '❌ Invalid IP address format';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            if (isNaN(networkCidr) || networkCidr < 0 || networkCidr > 32) {
+                errorDiv.textContent = '❌ Invalid CIDR (must be 0-32)';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Calculate required subnet bits
+            const subnetBits = Math.ceil(Math.log2(numSubnets));
+            const newCidr = networkCidr + subnetBits;
+
+            if (newCidr > 30) {
+                errorDiv.textContent = '❌ Too many subnets requested. Not enough address space.';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Generate subnet names
+            const subnetNames = generateSubnetNames(naming, numSubnets);
+
+            // Calculate total available IPs
+            const totalAvailable = Math.pow(2, 32 - networkCidr);
+            const subnetSize = Math.pow(2, 32 - newCidr);
+            const hostsPerSubnet = subnetSize - 2;
+
+            // Allocate subnets
+            const allocations = [];
+            let currentIp = ipToInt(networkIp);
+            const actualSubnets = Math.min(numSubnets, Math.pow(2, subnetBits)); // Use actual number that can fit
+
+            for (let i = 0; i < actualSubnets; i++) {
+                const networkInt = currentIp;
+                const broadcastInt = (networkInt + subnetSize - 1) >>> 0;
+                const firstHostInt = networkInt + 1;
+                const lastHostInt = broadcastInt - 1;
+
+                allocations.push({
+                    name: subnetNames[i],
+                    hostsRequested: hostsPerSubnet,
+                    hostsAvailable: hostsPerSubnet,
+                    network: intToIp(networkInt),
+                    mask: cidrToMask(newCidr),
+                    cidr: newCidr,
+                    firstHost: intToIp(firstHostInt),
+                    lastHost: intToIp(lastHostInt),
+                    broadcast: intToIp(broadcastInt),
+                    size: subnetSize,
+                    efficiency: '100.0'
+                });
+
+                currentIp = (currentIp + subnetSize) >>> 0;
+            }
+
+            const totalUsed = actualSubnets * subnetSize;
+            const totalHostsAllocated = actualSubnets * hostsPerSubnet;
+
+            // Display results
+            displayResults(allocations, totalUsed, totalAvailable, totalHostsAllocated);
+            resultsDiv.style.display = 'block';
+        }
+
+        function updateNetworkInfo() {
+            const cidr = parseInt(document.getElementById('networkCidr').value) || 24;
+            const totalIps = Math.pow(2, 32 - cidr);
+            document.getElementById('totalAvailable').textContent = totalIps.toLocaleString();
+            
+            const maxSubnets = Math.floor(totalIps / 4); // Minimum subnet is /30 with 4 IPs
+            document.getElementById('maxSubnets').textContent = '~' + maxSubnets.toLocaleString();
+            
+            // Update IP class if IP is valid
+            const ipInput = document.getElementById('networkIp').value.trim();
+            if (validateIp(ipInput)) {
+                const ipClass = getIpClass(ipInput);
+                document.getElementById('ipClass').textContent = 'Class ' + ipClass;
+            }
+        }
+
+        function addSubnet() {
+            subnetCounter++;
+            const container = document.getElementById('subnetRequirements');
+            const newSubnet = document.createElement('div');
+            newSubnet.className = 'subnet-requirement';
+            newSubnet.innerHTML = `
+                <div class="subnet-requirement-header">
+                    <span class="subnet-number">${subnetCounter}</span>
+                    <input type="text" placeholder="Subnet Name (e.g., IT Department)" class="subnet-name-input">
+                    <input type="number" placeholder="Hosts needed" class="hosts-input" min="1">
+                    <button class="btn btn-danger" onclick="removeSubnet(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(newSubnet);
+        }
+
+        function removeSubnet(btn) {
+            btn.closest('.subnet-requirement').remove();
+            updateSubnetNumbers();
+        }
+
+        function updateSubnetNumbers() {
+            const subnets = document.querySelectorAll('.subnet-requirement');
+            subnets.forEach((subnet, index) => {
+                subnet.querySelector('.subnet-number').textContent = index + 1;
+            });
+            subnetCounter = subnets.length;
+        }
+
+        function clearAll() {
+            if (currentMode === 'host-based') {
+                document.getElementById('subnetRequirements').innerHTML = '';
+                subnetCounter = 0;
+                addSubnet();
+            } else {
+                document.getElementById('numSubnets').value = 8;
+                document.getElementById('subnetNaming').value = 'numeric';
+                document.getElementById('customPrefix').value = 'Subnet';
+                updateSubnetPreview();
+            }
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function loadTemplate() {
+            const template = document.getElementById('template').value;
+            if (!template) return;
+
+            // Switch to host-based mode for templates
+            switchMode('host-based');
+
+            const templates = {
+                'small-office': [
+                    { name: 'Management', hosts: 10 },
+                    { name: 'Sales Department', hosts: 25 },
+                    { name: 'IT Department', hosts: 15 },
+                    { name: 'Guest WiFi', hosts: 50 },
+                    { name: 'Servers', hosts: 5 }
+                ],
+                'enterprise': [
+                    { name: 'Executive Floor', hosts: 20 },
+                    { name: 'HR Department', hosts: 45 },
+                    { name: 'Finance Department', hosts: 60 },
+                    { name: 'Engineering', hosts: 200 },
+                    { name: 'Marketing', hosts: 80 },
+                    { name: 'Sales Floor 1', hosts: 100 },
+                    { name: 'Sales Floor 2', hosts: 100 },
+                    { name: 'Data Center', hosts: 50 },
+                    { name: 'DMZ', hosts: 10 },
+                    { name: 'Guest Network', hosts: 250 }
+                ],
+                'campus': [
+                    { name: 'Building A', hosts: 500 },
+                    { name: 'Building B', hosts: 400 },
+                    { name: 'Building C', hosts: 300 },
+                    { name: 'Library', hosts: 150 },
+                    { name: 'Student Dorms', hosts: 1000 },
+                    { name: 'Faculty Offices', hosts: 200 },
+                    { name: 'Labs', hosts: 250 },
+                    { name: 'Administration', hosts: 100 }
+                ],
+                'datacenter': [
+                    { name: 'Web Servers', hosts: 30 },
+                    { name: 'Database Servers', hosts: 20 },
+                    { name: 'Application Servers', hosts: 40 },
+                    { name: 'Storage Network', hosts: 15 },
+                    { name: 'Management Network', hosts: 10 },
+                    { name: 'Backup Network', hosts: 15 },
+                    { name: 'DMZ Public', hosts: 25 },
+                    { name: 'DMZ Private', hosts: 20 },
+                    { name: 'Load Balancers', hosts: 8 },
+                    { name: 'Monitoring', hosts: 12 },
+                    { name: 'Development', hosts: 50 },
+                    { name: 'Testing', hosts: 35 }
+                ]
+            };
+
+            // Set appropriate network for each template
+            const networkConfigs = {
+                'small-office': { ip: '192.168.1.0', cidr: 24 },
+                'enterprise': { ip: '10.0.0.0', cidr: 16 },
+                'campus': { ip: '172.16.0.0', cidr: 16 },
+                'datacenter': { ip: '10.10.0.0', cidr: 16 }
+            };
+
+            const selectedTemplate = templates[template];
+            const networkConfig = networkConfigs[template];
+            
+            if (!selectedTemplate) return;
+
+            // Set network configuration
+            if (networkConfig) {
+                document.getElementById('networkIp').value = networkConfig.ip;
+                document.getElementById('networkCidr').value = networkConfig.cidr;
+                document.getElementById('subnetMask').value = cidrToMask(networkConfig.cidr);
+                updateNetworkInfo();
+            }
+
+            // Clear existing subnets
+            document.getElementById('subnetRequirements').innerHTML = '';
+            subnetCounter = 0;
+
+            // Add template subnets
+            selectedTemplate.forEach(subnet => {
+                addSubnet();
+                const lastSubnet = document.querySelector('.subnet-requirement:last-child');
+                lastSubnet.querySelector('.subnet-name-input').value = subnet.name;
+                lastSubnet.querySelector('.hosts-input').value = subnet.hosts;
+            });
+        }
+
+        function calculateVLSM() {
+            const errorDiv = document.getElementById('errorMsg');
+            const resultsDiv = document.getElementById('results');
+            errorDiv.style.display = 'none';
+
+            const networkIp = document.getElementById('networkIp').value.trim();
+            const networkCidr = parseInt(document.getElementById('networkCidr').value);
+            const sortMethod = document.getElementById('sortMethod').value;
+
+            if (!validateIp(networkIp)) {
+                errorDiv.textContent = '❌ Invalid IP address format';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            if (isNaN(networkCidr) || networkCidr < 0 || networkCidr > 32) {
+                errorDiv.textContent = '❌ Invalid CIDR (must be 0-32)';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Collect subnet requirements
+            const requirements = [];
+            const subnets = document.querySelectorAll('.subnet-requirement');
+
+            subnets.forEach((subnet, index) => {
+                const name = subnet.querySelector('.subnet-name-input').value.trim() || `Subnet ${index + 1}`;
+                const hosts = parseInt(subnet.querySelector('.hosts-input').value);
+
+                if (hosts && hosts > 0) {
+                    requirements.push({ 
+                        name, 
+                        hostsNeeded: hosts
+                    });
+                }
+            });
+
+            if (requirements.length === 0) {
+                errorDiv.textContent = '❌ Please add at least one subnet requirement';
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Sort based on selected method
+            switch(sortMethod) {
+                case 'largest':
+                    requirements.sort((a, b) => b.hostsNeeded - a.hostsNeeded);
+                    break;
+                case 'smallest':
+                    requirements.sort((a, b) => a.hostsNeeded - b.hostsNeeded);
+                    break;
+                case 'alphabetical':
+                    requirements.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                // 'sequential' needs no sorting
+            }
+
+            // Calculate total available IPs
+            const totalAvailable = Math.pow(2, 32 - networkCidr);
+
+            // Allocate subnets
+            const allocations = [];
+            let currentIp = ipToInt(networkIp);
+            let totalUsed = 0;
+            let totalHostsAllocated = 0;
+
+            for (const req of requirements) {
+                // Find minimum subnet size needed
+                let subnetSize = 4; // Minimum subnet size
+                let cidrNeeded = 30; // Start with /30
+
+                while (subnetSize - 2 < req.hostsNeeded && cidrNeeded > 0) {
+                    cidrNeeded--;
+                    subnetSize = Math.pow(2, 32 - cidrNeeded);
+                }
+
+                if (totalUsed + subnetSize > totalAvailable) {
+                    errorDiv.textContent = `❌ Not enough IP space. Need ${(totalUsed + subnetSize).toLocaleString()} IPs but only ${totalAvailable.toLocaleString()} available.`;
+                    errorDiv.style.display = 'block';
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+
+                const networkInt = currentIp;
+                const broadcastInt = (networkInt + subnetSize - 1) >>> 0;
+                const firstHostInt = networkInt + 1;
+                const lastHostInt = broadcastInt - 1;
+                const hostsAvailable = subnetSize - 2;
+
+                allocations.push({
+                    name: req.name,
+                    hostsRequested: req.hostsNeeded,
+                    hostsAvailable: hostsAvailable,
+                    network: intToIp(networkInt),
+                    mask: cidrToMask(cidrNeeded),
+                    cidr: cidrNeeded,
+                    firstHost: intToIp(firstHostInt),
+                    lastHost: intToIp(lastHostInt),
+                    broadcast: intToIp(broadcastInt),
+                    size: subnetSize,
+                    efficiency: (req.hostsNeeded / hostsAvailable * 100).toFixed(1)
+                });
+
+                currentIp = (currentIp + subnetSize) >>> 0;
+                totalUsed += subnetSize;
+                totalHostsAllocated += hostsAvailable;
+            }
+
+            // Display results
+            displayResults(allocations, totalUsed, totalAvailable, totalHostsAllocated);
+            resultsDiv.style.display = 'block';
+        }
+
+        function displayResults(allocations, totalUsed, totalAvailable, totalHostsAllocated) {
+            // Update statistics
+            document.getElementById('subnetsCreated').textContent = allocations.length;
+            document.getElementById('totalHosts').textContent = totalHostsAllocated.toLocaleString();
+            document.getElementById('ipsUsed').textContent = totalUsed.toLocaleString();
+            
+            const efficiency = (totalUsed / totalAvailable * 100).toFixed(1);
+            document.getElementById('efficiency').textContent = efficiency + '%';
+
+            // Update progress bar
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = Math.min(efficiency, 100) + '%';
+            progressBar.textContent = efficiency + '%';
+
+            // Update allocation table
+            const tbody = document.getElementById('allocationTable');
+            tbody.innerHTML = '';
+
+            allocations.forEach((alloc, index) => {
+                const row = tbody.insertRow();
+                const efficiencyBadge = parseFloat(alloc.efficiency) > 80 ? 'badge-optimal' : 'badge-warning';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${alloc.name}</strong></td>
+                    <td>${alloc.network}/${alloc.cidr}</td>
+                    <td>${alloc.mask}</td>
+                    <td>${alloc.hostsRequested}</td>
+                    <td>${alloc.hostsAvailable}</td>
+                    <td>${alloc.firstHost}</td>
+                    <td>${alloc.lastHost}</td>
+                    <td>${alloc.broadcast}</td>
+                    <td><span class="allocation-badge ${efficiencyBadge}">${alloc.efficiency}%</span></td>
+                `;
+            });
+
+            // Create visualization
+            createVisualization(allocations, totalUsed, totalAvailable);
+        }
+
+        function createVisualization(allocations, totalUsed, totalAvailable) {
+            const container = document.getElementById('ipVisualization');
+            container.innerHTML = '';
+
+            const blockDiv = document.createElement('div');
+            blockDiv.className = 'ip-block';
+
+            // Generate colors for each subnet
+            const colors = [
+                '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'
+            ];
+
+            allocations.forEach((alloc, index) => {
+                const percentage = (alloc.size / totalAvailable * 100);
+                const subnetDiv = document.createElement('div');
+                subnetDiv.className = 'subnet-block';
+                subnetDiv.style.width = percentage + '%';
+                subnetDiv.style.background = colors[index % colors.length];
+                
+                subnetDiv.innerHTML = `
+                    <div class="subnet-name">${alloc.name}</div>
+                    <div class="subnet-info">${alloc.network}/${alloc.cidr}</div>
+                    <div class="subnet-info">${alloc.hostsAvailable} hosts</div>
+                `;
+                
+                blockDiv.appendChild(subnetDiv);
+            });
+
+            // Add unused space if any
+            const unusedPercentage = ((totalAvailable - totalUsed) / totalAvailable * 100);
+            if (unusedPercentage > 0) {
+                const unusedDiv = document.createElement('div');
+                unusedDiv.className = 'subnet-block unused-space';
+                unusedDiv.style.width = unusedPercentage + '%';
+                unusedDiv.style.background = 'repeating-linear-gradient(45deg, #6b7280, #6b7280 5px, #4b5563 5px, #4b5563 10px)';
+                unusedDiv.innerHTML = `
+                    <div class="subnet-name">Unused</div>
+                    <div class="subnet-info">${(totalAvailable - totalUsed).toLocaleString()} IPs</div>
+                `;
+                blockDiv.appendChild(unusedDiv);
+            }
+
+            container.appendChild(blockDiv);
+        }
+
+        function exportConfig() {
+            const allocations = [];
+            const rows = document.querySelectorAll('#allocationTable tr');
+            
+            if (rows.length === 0) {
+                alert('Please calculate VLSM first before exporting');
+                return;
+            }
+
+            let config = 'VLSM Configuration Export\n';
+            config += '=' .repeat(50) + '\n\n';
+            config += `Network: ${document.getElementById('networkIp').value}/${document.getElementById('networkCidr').value}\n`;
+            config += `Date: ${new Date().toLocaleString()}\n\n`;
+            config += 'Subnet Allocations:\n';
+            config += '-'.repeat(50) + '\n\n';
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                if (cells.length > 0) {
+                    config += `Subnet ${cells[0].textContent}: ${cells[1].textContent}\n`;
+                    config += `  Network: ${cells[2].textContent}\n`;
+                    config += `  Subnet Mask: ${cells[3].textContent}\n`;
+                    config += `  First Host: ${cells[6].textContent}\n`;
+                    config += `  Last Host: ${cells[7].textContent}\n`;
+                    config += `  Broadcast: ${cells[8].textContent}\n`;
+                    config += `  Hosts Available: ${cells[5].textContent}\n\n`;
+                }
+            });
+
+            // Create and download file
+            const blob = new Blob([config], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'vlsm_config.txt';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        document.getElementById('networkCidr').addEventListener('input', updateNetworkInfo);
+        document.getElementById('networkIp').addEventListener('blur', autoSetCidr);
+        document.getElementById('subnetNaming').addEventListener('change', function() {
+            document.getElementById('customPrefixDiv').style.display = 
+                this.value === 'custom' ? 'block' : 'none';
+        });
+
+        // Initialize
+        addSubnet();
+        autoSetCidr(); // Set initial CIDR based on IP
+        updateNetworkInfo();
+        updateSubnetMask(); // Set initial subnet mask display
+        updateSubnetPreview(); // Initialize preview
+    </script>
+</body>
+</html>
