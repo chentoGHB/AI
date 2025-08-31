@@ -23,3 +23,11 @@ o	suggest excluding the first 20 addresses
 •	add more option to exclude more ip address
 •	add option to include multiple dns serverv ip address
 •	include an option to enter default gateway, if skip use the first avaiable address
+
+# VLSM Calculator
+create vlsm calculator
+set the cidr prefix the same mask for the main network ip address
+split the Subnet Requirements into 2 requirement of how many host needed or how many subnet needed
+remove growth percentages
+
+
