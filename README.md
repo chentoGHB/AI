@@ -32,3 +32,6 @@ remove growth percentages
 
 # subnet Calculator
 create a subnet calculator with the college of DuPage and CIT and Tony Chen on the top of the page
+
+# magic number subnet Calculator
+As an expert in HTML and JavaScript create a subnet calculator Subnetting with the Magic Number Method Put College of DuPage and CIT department, and Tony Chen's name at the top of the page
