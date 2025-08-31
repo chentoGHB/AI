@@ -30,4 +30,5 @@ set the cidr prefix the same mask for the main network ip address
 split the Subnet Requirements into 2 requirement of how many host needed or how many subnet needed
 remove growth percentages
 
-
+# subnet Calculator
+create a subnet calculator with the college of DuPage and CIT and Tony Chen on the top of the page
